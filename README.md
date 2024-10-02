@@ -44,26 +44,26 @@ We'll be grabbing 2 native arm32 executables and compile one other. All the step
 
 Get the original i386 LPR driver, unpack the files and the control information
 
-	wget https://download.brother.com/welcome/dlf005893/hl2270dwlpr-2.1.0-1.i386.deb
-	dpkg -x hl2270dwlpr-2.1.0-1.i386.deb hl2270dwlpr-2.1.0-1.armhf.extracted
-	dpkg-deb -e hl2270dwlpr-2.1.0-1.i386.deb hl2270dwlpr-2.1.0-1.armhf.extracted/DEBIAN
-	sed -i 's/Architecture: i386/Architecture: armhf/' hl2270dwlpr-2.1.0-1.armhf.extracted/DEBIAN/control
-	echo true > hl2270dwlpr-2.1.0-1.armhf.extracted/usr/local/Brother/Printer/HL2270DW/inf/braddprinter
+	wget https://download.brother.com/welcome/dlf006128/mfc440cnlpr-1.0.1-1.i386.deb
+	dpkg -x mfc440cnlpr-1.0.1-1.i386.deb mfc440cnlpr-1.0.1-1.armhf.extracted
+	dpkg-deb -e mfc440cnlpr-1.0.1-1.i386.deb mfc440cnlpr-1.0.1-1.armhf.extracted/DEBIAN
+	sed -i 's/Architecture: i386/Architecture: armhf/' mfc440cnlpr-1.0.1-1.armhf.extracted/DEBIAN/control
+	echo true > mfc440cnlpr-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/inf/braddprinter
 
 Grab the Brother ARM drivers from a generic armhf archive they provide and copy the ARM code into the unpacked folders. Note that HL2270 does not use `brprintconflsr3`.
 
 	wget http://download.brother.com/welcome/dlf103361/brgenprintml2pdrv-4.0.0-1.armhf.deb
 	dpkg -x brgenprintml2pdrv-4.0.0-1.armhf.deb brgenprintml2pdrv-4.0.0-1.armhf.extracted
-	# cp brgenprintml2pdrv-4.0.0-1.armhf.extracted/opt/brother/Printers/BrGenPrintML2/lpd/armv7l/brprintconflsr3 hl2270dwlpr-2.1.0-1.armhf.extracted/usr/local/Brother/Printer/HL2270DW/lpd
-	cp brgenprintml2pdrv-4.0.0-1.armhf.extracted/opt/brother/Printers/BrGenPrintML2/lpd/armv7l/rawtobr3 hl2270dwlpr-2.1.0-1.armhf.extracted/usr/local/Brother/Printer/HL2270DW/lpd
+	# cp brgenprintml2pdrv-4.0.0-1.armhf.extracted/opt/brother/Printers/BrGenPrintML2/lpd/armv7l/brprintconflsr3 mfc440cnlpr-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/lpd
+	cp brgenprintml2pdrv-4.0.0-1.armhf.extracted/opt/brother/Printers/BrGenPrintML2/lpd/armv7l/rawtobr3 mfc440cnlpr-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/lpd
 
 Now repackage it
 
-	cd hl2270dwlpr-2.1.0-1.armhf.extracted
+	cd mfc440cnlpr-1.0.1-1.armhf.extracted
 	find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > DEBIAN/md5sums
 	cd ..
-	chmod 755 hl2270dwlpr-2.1.0-1.armhf.extracted/DEBIAN/p* hl2270dwlpr-2.1.0-1.armhf.extracted/usr/local/Brother/Printer/HL2270DW/inf/* hl2270dwlpr-2.1.0-1.armhf.extracted/usr/local/Brother/Printer/HL2270DW/lpd/*
-	dpkg-deb -b hl2270dwlpr-2.1.0-1.armhf.extracted hl2270dwlpr-2.1.0-1.armhf.deb
+	chmod 755 mfc440cnlpr-1.0.1-1.armhf.extracted/DEBIAN/p* mfc440cnlpr-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/inf/* mfc440cnlpr-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/lpd/*
+	dpkg-deb -b mfc440cnlpr-1.0.1-1.armhf.extracted mfc440cnlpr-1.0.1-1.armhf.deb
 
 ### Repackage CUPS wrapper
 
@@ -77,26 +77,37 @@ Compile `brcupsconfig4`
 
 	gcc brcupsconfig3/brcupsconfig.c -o brcupsconfig4
 
-If you are running these steps on the arm64 platform do cross complilation by first getting `arm-linux-gnueabihf-gcc-9` via `sudo apt install gcc-9-arm-linux-gnueabihf` and then running `arm-linux-gnueabihf-gcc-9 brcupsconfig3/brcupsconfig.c -o brcupsconfig4`
 
+ or get 
+ 	wget https://download.brother.com/welcome/dlf006675/ink3_GPL_src_101-1.tar.gz
+  	tar zxvf ink3_GPL_src_101-1.tar.gz
+   	cd ink3_GPL_src_101-1
+
+gcc cupswrappermfc440cn_src/brcupsconfig/brcupsconfig.c -o brcupsconfig
+
+
+If you are running these steps on the arm64 platform do cross complilation by first getting `arm-linux-gnueabihf-gcc-9` via `sudo apt install gcc-12-arm-linux-gnueabihf` and then running `arm-linux-gnueabihf-gcc-12 brcupsconfig3/brcupsconfig.c -o brcupsconfig`
+
+	arm-linux-gnueabihf-gcc-12 cupswrappermfc440cn_src/brcupsconfig/brcupsconfig.c -o brcupsconfig
+ 
 Grab the original i386 CUPS wrapper and unpack it
 
-	wget https://download.brother.com/welcome/dlf005895/cupswrapperHL2270DW-2.0.4-2.i386.deb
-	dpkg -x cupswrapperHL2270DW-2.0.4-2.i386.deb cupswrapperHL2270DW-2.0.4-2.armhf.extracted
-	dpkg-deb -e cupswrapperHL2270DW-2.0.4-2.i386.deb cupswrapperHL2270DW-2.0.4-2.armhf.extracted/DEBIAN
-	sed -i 's/Architecture: i386/Architecture: armhf/' cupswrapperHL2270DW-2.0.4-2.armhf.extracted/DEBIAN/control
+	wget https://download.brother.com/welcome/dlf006130/mfc440cncupswrapper-1.0.1-1.i386.deb
+	dpkg -x mfc440cncupswrapper-1.0.1-1.i386.deb mfc440cncupswrapper-1.0.1-1.armhf.extracted
+	dpkg-deb -e mfc440cncupswrapper-1.0.1-1.i386.deb mfc440cncupswrapper-1.0.1-1.armhf.extracted/DEBIAN
+	sed -i 's/Architecture: i386/Architecture: armhf/' mfc440cncupswrapper-1.0.1-1.armhf.extracted/DEBIAN/control
 
 Copy the compiled code into the unpacked folder
 
-	cp brhl2270dwcups_src-2.0.4-2/brcupsconfig4 cupswrapperHL2270DW-2.0.4-2.armhf.extracted/usr/local/Brother/Printer/HL2270DW/cupswrapper
+	cp brhl2270dwcups_src-2.0.4-2/brcupsconfig4 mfc440cncupswrapper-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/cupswrapper
 
 Repack it
 
-	cd cupswrapperHL2270DW-2.0.4-2.armhf.extracted
+	cd mfc440cncupswrapper-1.0.1-1.armhf.extracted
 	find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '%P ' | xargs md5sum > DEBIAN/md5sums
 	cd ..
-	chmod 755 cupswrapperHL2270DW-2.0.4-2.armhf.extracted/DEBIAN/p* cupswrapperHL2270DW-2.0.4-2.armhf.extracted/usr/local/Brother/Printer/HL2270DW/cupswrapper/*
-	dpkg-deb -b cupswrapperHL2270DW-2.0.4-2.armhf.extracted cupswrapperHL2270DW-2.0.4-2.armhf.deb
+	chmod 755 mfc440cncupswrapper-1.0.1-1.armhf.extracted/DEBIAN/p* mfc440cncupswrapper-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/cupswrapper/*
+	dpkg-deb -b mfc440cncupswrapper-1.0.1-1.armhf.extracted mfc440cncupswrapper-1.0.1-1.armhf.deb
 
 ### Installing
 
@@ -109,7 +120,7 @@ Repack it
 Install prereqs and install the drivers
 
 	sudo apt install psutils cups
-	sudo dpkg -i hl2270dwlpr-2.1.0-1.armhf.deb cupswrapperHL2270DW-2.0.4-2.armhf.deb
+	sudo dpkg -i mfc440cnlpr-1.0.1-1.armhf.deb mfc440cncupswrapper-1.0.1-1.armhf.deb
 
 > You may need to install  other runtime dependencies such as a2ps, glibc-32bit, ghostscript
 
@@ -119,8 +130,8 @@ In case you're missing the printer defeniton you can extract it from the cupswra
 
 Top extract extract the filter and the PPD file directly from the cupswrapper run this:
 
-    sed -e '0,/cat <<!ENDOFWFILTER! >/d' -e '/^!ENDOFWFILTER!/,$d' './cupswrapperHL2270DW-2.0.4' -e 's|\\||g' > ./brlpdwrapperHL2270DW
-    sed -e '0,/cat <<ENDOFPPDFILE >/d'   -e '/^ENDOFPPDFILE/,$d'   './cupswrapperHL2270DW-2.0.4'              > ./HL2270DW.ppd
+    sed -e '0,/cat <<!ENDOFWFILTER! >/d' -e '/^!ENDOFWFILTER!/,$d' './mfc440cncupswrapper-1.0.1-1' -e 's|\\||g' > ./brlpdwrapperMFC440CN
+    sed -e '0,/cat <<ENDOFPPDFILE >/d'   -e '/^ENDOFPPDFILE/,$d'   './mfc440cncupswrapper-1.0.1-1'              > ./MFC440CN.ppd
 
 
 ### How to install on an x86 platform
