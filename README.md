@@ -34,9 +34,7 @@ Below is an example of how to create ARM packages for Brother HL2270DW, but it s
 
 Oh, yeah and next time just buy a printer that has [Driverless printing](https://wiki.debian.org/DriverlessPrinting#The_Concept_of_Driverless_Printing) or [IPP Everywhere](https://wiki.debian.org/IPPEverywhere)
 
-## Creating the ARM packages for HL2270-DW
-
-> Note: if you just want to install the precompiled packages grab them from this repo and run `sudo apt install psutils cups; sudo dpkg -i hl2270dwlpr-2.1.0-1.armhf.deb cupswrapperHL2270DW-2.0.4-2.armhf.deb`. Steps below show how to re-create them.
+## Creating the ARM packages for MCF440CN
 
 We'll be grabbing 2 native arm32 executables and compile one other. All the steps can be done on RPi or on x86 Doing it on x86 will require cross-compilation of `brcupsconfig` for armhf.
 
@@ -88,6 +86,8 @@ gcc cupswrappermfc440cn_src/brcupsconfig/brcupsconfig.c -o brcupsconfig
 
 If you are running these steps on the arm64 platform do cross complilation by first getting `arm-linux-gnueabihf-gcc-9` via `sudo apt install gcc-12-arm-linux-gnueabihf` and then running `arm-linux-gnueabihf-gcc-12 brcupsconfig3/brcupsconfig.c -o brcupsconfig`
 
+sudo apt-get install libc6-dev-i386-amd64-cross libc6-dev-i386-cross build-essential gcc-multilib*
+
 	arm-linux-gnueabihf-gcc-12 cupswrappermfc440cn_src/brcupsconfig/brcupsconfig.c -o brcupsconfig
  
 Grab the original i386 CUPS wrapper and unpack it
@@ -100,6 +100,10 @@ Grab the original i386 CUPS wrapper and unpack it
 Copy the compiled code into the unpacked folder
 
 	cp brhl2270dwcups_src-2.0.4-2/brcupsconfig4 mfc440cncupswrapper-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/cupswrapper
+ 
+or for 64bit
+cp cupswrappermfc440cn_src/brcupsconfig/brcupsconfig mfc440cncupswrapper-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/cupswrapper
+
 
 Repack it
 
