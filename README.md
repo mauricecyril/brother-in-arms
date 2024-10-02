@@ -81,12 +81,14 @@ Compile `brcupsconfig4`
   	tar zxvf ink3_GPL_src_101-1.tar.gz
    	cd ink3_GPL_src_101-1
 
-gcc cupswrappermfc440cn_src/brcupsconfig/brcupsconfig.c -o brcupsconfig
+	gcc cupswrappermfc440cn_src/brcupsconfig/brcupsconfig.c -o brcupsconfig
 
 
 If you are running these steps on the arm64 platform do cross complilation by first getting `arm-linux-gnueabihf-gcc-9` via `sudo apt install gcc-12-arm-linux-gnueabihf` and then running `arm-linux-gnueabihf-gcc-12 brcupsconfig3/brcupsconfig.c -o brcupsconfig`
 
-sudo apt-get install libc6-dev-i386-amd64-cross libc6-dev-i386-cross build-essential gcc-multilib*
+	sudo apt-get install libc6-dev-i386-amd64-cross libc6-dev-i386-cross build-essential gcc-multilib*
+
+	binutils-arm-linux-gnueabihf
 
 	arm-linux-gnueabihf-gcc-12 cupswrappermfc440cn_src/brcupsconfig/brcupsconfig.c -o brcupsconfig
  
@@ -99,10 +101,7 @@ Grab the original i386 CUPS wrapper and unpack it
 
 Copy the compiled code into the unpacked folder
 
-	cp brhl2270dwcups_src-2.0.4-2/brcupsconfig4 mfc440cncupswrapper-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/cupswrapper
- 
-or for 64bit
-cp cupswrappermfc440cn_src/brcupsconfig/brcupsconfig mfc440cncupswrapper-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/cupswrapper
+cp ink3_GPL_src_101-1/cupswrappermfc440cn_src/brcupsconfig/brcupsconfig mfc440cncupswrapper-1.0.1-1.armhf.extracted/usr/local/Brother/Printer/mfc440cn/cupswrapper
 
 
 Repack it
